@@ -1,0 +1,5 @@
+Завдання
+
+В проекті ShopProjectMVC додати та реалізувати клас ProductService 
+(має імплементувати інтерфейс IProductService) 
+та дописати реалізацію класа GenericRepository.
