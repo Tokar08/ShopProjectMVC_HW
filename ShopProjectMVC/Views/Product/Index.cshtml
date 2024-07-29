@@ -1,0 +1,24 @@
+﻿@model IEnumerable<ShopProjectMVC.Core.Models.Product>
+
+@{
+    ViewData["Title"] = "Product List";
+}
+
+<div class="main-container">
+    <h2>@ViewData["Title"]</h2>
+    <hr />
+    <div class="product-grid">
+        @foreach (var product in Model)
+        {
+        <div class="product-card">
+            <h3>@product.Name</h3>
+            <hr/>
+            <p>@product.Description</p>
+            <p>Price: @product.Price</p>
+            <p>Available: @product.Count</p>
+        </div>
+        }
+    </div>
+</div>
+
+<link rel="stylesheet" href="css/site.css">

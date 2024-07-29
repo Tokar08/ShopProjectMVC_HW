@@ -35,7 +35,9 @@ public class ProductService : IProductService
 
     public IEnumerable<Product> GetAll()
     {
-        return _repository.GetAll<Product>().ToList();
+        // По вашему совету добавлена фильтрация товаров, количество которых больше нуля,
+        // чтобы пользователи видели только доступные товары
+        return _repository.GetAll<Product>().Where(product => product.Count > 0).ToList();
     }
 
     public async Task<Order> BuyProduct(int userId, int productId)

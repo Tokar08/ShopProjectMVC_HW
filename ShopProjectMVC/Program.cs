@@ -13,6 +13,7 @@ builder.Services.AddDbContext<ShopProjectContext>(options => options.UseSqlServe
 builder.Services.AddScoped<IRepository, GenericRepository>();
 builder.Services.AddTransient<IOrderService, OrderService>();
 builder.Services.AddTransient<IUserService, UserService>();
+builder.Services.AddTransient<IProductService, ProductService>();
 
 //builder.Services.AddTransient - creates object every time
 //builder.Services.AddScoped    - creates object every request
