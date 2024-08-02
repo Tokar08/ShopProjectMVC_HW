@@ -1,8 +1,10 @@
 ﻿using Microsoft.AspNetCore.Mvc;
+using ShopProjectMVC.Core.Access;
 using ShopProjectMVC.Core.Interfaces;
 
 namespace ShopProjectMVC.Controllers;
 
+[RequireLogin]
 public class OrdersController : Controller
 {
     private readonly IOrderService _orderService;
@@ -14,7 +16,7 @@ public class OrdersController : Controller
 
     public IActionResult Index()
     {
-        var orders = _orderService.GetOrders(1);
+        var orders = _orderService.GetOrders(1).ToList();
         return View(orders);
     }
 }

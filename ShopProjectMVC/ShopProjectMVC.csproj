@@ -25,4 +25,8 @@
     <ProjectReference Include="..\ShopProjectMVC.Storage\ShopProjectMVC.Storage.csproj" />
   </ItemGroup>
 
+  <ItemGroup>
+    <Folder Include="wwwroot\pictures\" />
+  </ItemGroup>
+
 </Project>

@@ -9,5 +9,6 @@ public interface IProductService
     Task DeleteProduct(int id);
     Task<Product> GetProductById(int id);
     IEnumerable<Product> GetAll();
+    IEnumerable<Category> GetAllCategories();
     Task<Order> BuyProduct(int userId, int productId);
 }

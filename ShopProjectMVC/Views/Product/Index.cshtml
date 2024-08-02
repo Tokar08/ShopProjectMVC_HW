@@ -1,24 +1,54 @@
 ﻿@model IEnumerable<ShopProjectMVC.Core.Models.Product>
+@inject IHttpContextAccessor accessor
+@* @inject IWebHostEnvironment env *@
+@using System.IO
 
 @{
-    ViewData["Title"] = "Product List";
+    ViewData["Title"] = "Products";
+    Layout = "~/Views/Shared/_Layout.cshtml";
 }
 
-<div class="main-container">
-    <h2>@ViewData["Title"]</h2>
-    <hr />
-    <div class="product-grid">
+<h1>Products</h1>
+
+@if (accessor.HttpContext.Session.GetInt32("role") == 1)
+{
+    <a class="btn btn-success" asp-action="Create">Add product</a>
+    <br />
+    <table class="table table-striped table-bordered">
+        <thead>
+            <tr>
+                <th>Id</th>
+                <th>Name</th>
+                <th>Count</th>
+                <th>Price</th>
+                <th>Operations</th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (var product in Model)
+            {
+                <tr>
+                    <td>@product.Id</td>
+                    <td>@product.Name</td>
+                    <td>@product.Count</td>
+                    <td>@product.Price</td>
+                    <td>
+                        <div>
+                            <a asp-action="Edit" asp-route-id="@product.Id">Edit</a>
+                            <a asp-action="Delete" asp-route-id="@product.Id">Delete</a>
+                        </div>
+                    </td>
+                </tr>
+            }
+        </tbody>
+    </table>
+}
+    else
+    {
+    <div class="container grid-container">
         @foreach (var product in Model)
         {
-        <div class="product-card">
-            <h3>@product.Name</h3>
-            <hr/>
-            <p>@product.Description</p>
-            <p>Price: @product.Price</p>
-            <p>Available: @product.Count</p>
-        </div>
+            <partial name="ProductComponent" model="@product"/>    
         }
-    </div>
-</div>
-
-<link rel="stylesheet" href="css/site.css">
+        </div>
+    }

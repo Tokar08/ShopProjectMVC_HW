@@ -17,22 +17,7 @@ public class ProductService : IProductService
     {
         return _repository.Add(product);
     }
-
-    public Task<Product> UpdateProduct(Product product)
-    {
-        return _repository.Update(product);
-    }
-
-    public Task DeleteProduct(int id)
-    {
-        return _repository.Delete<Product>(id);
-    }
-
-    public Task<Product> GetProductById(int id)
-    {
-        return _repository.GetById<Product>(id);
-    }
-
+    
     public IEnumerable<Product> GetAll()
     {
         // По вашему совету добавлена фильтрация товаров, количество которых больше нуля,
@@ -62,5 +47,25 @@ public class ProductService : IProductService
         await _repository.Update(product);
 
         return order;
+    }
+
+    public Task DeleteProduct(int id)
+    {
+        return _repository.Delete<Product>(id);
+    }
+    
+    public IEnumerable<Category> GetAllCategories()
+    {
+        return _repository.GetAll<Category>();
+    }
+
+    public Task<Product> GetProductById(int id)
+    {
+        return _repository.GetById<Product>(id);
+    }
+
+    public Task<Product> UpdateProduct(Product product)
+    {
+        return _repository.Update(product);
     }
 }

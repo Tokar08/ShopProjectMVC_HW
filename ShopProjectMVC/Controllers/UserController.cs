@@ -28,7 +28,15 @@ public class UserController : Controller
     {
         var userFromDb = await _userService.Login(user.Email, user.Password);
         // save user
-        return RedirectToAction("Index", "Home");
+        
+        if(userFromDb == null)
+        {
+            return NotFound();
+        }
+
+        HttpContext.Session.SetString("user", userFromDb.Name);
+        HttpContext.Session.SetInt32("role", (int)userFromDb.Role);
+        return RedirectToAction("Index", "Product");
     }
 
     [HttpPost]
@@ -37,6 +45,6 @@ public class UserController : Controller
         user.Role = Role.Client;
         user.CreatedAt = DateTime.UtcNow;
         await _userService.Register(user);
-        return RedirectToAction("Index", "Home");
+        return RedirectToAction("Index", "Product");
     }
 }
