@@ -1,4 +1,5 @@
 ﻿using Microsoft.AspNetCore.Mvc;
+using ShopProjectMVC.Core.Exceptions;
 using ShopProjectMVC.Core.Interfaces;
 using ShopProjectMVC.Core.Models;
 
@@ -13,38 +14,45 @@ public class UserController : Controller
         _userService = userService;
     }
 
-    public IActionResult Login()
-    {
-        return View();
-    }
+    public IActionResult Login() => View();
 
-    public IActionResult Register()
-    {
-        return View();  
-    }
+    public IActionResult Register() => View();
 
     [HttpPost]
     public async Task<IActionResult> Login(User user)
     {
-        var userFromDb = await _userService.Login(user.Email, user.Password);
-        // save user
-        
-        if(userFromDb == null)
+        try
         {
-            return NotFound();
-        }
+            var userFromDb = await _userService.Login(user.Email, user.Password) 
+                             ?? throw new EntityNotFoundException(typeof(User), 0);
+            
+            HttpContext.Session.SetInt32("id", userFromDb.Id);
+            HttpContext.Session.SetString("user", userFromDb.Name);
+            HttpContext.Session.SetInt32("role", (int)userFromDb.Role);
 
-        HttpContext.Session.SetString("user", userFromDb.Name);
-        HttpContext.Session.SetInt32("role", (int)userFromDb.Role);
-        return RedirectToAction("Index", "Product");
+            return RedirectToAction("Index", "Product");
+        }
+        catch (Exception ex)
+        {
+            ViewBag.ErrorMessage = $"Ошибка при попытке входа: {ex.Message}";
+            return View(user);
+        }
     }
 
     [HttpPost]
     public async Task<IActionResult> Register(User user)
     {
-        user.Role = Role.Client;
-        user.CreatedAt = DateTime.UtcNow;
-        await _userService.Register(user);
-        return RedirectToAction("Index", "Product");
+        try
+        {
+            user.Role = Role.Client;
+            user.CreatedAt = DateTime.UtcNow;
+            await _userService.Register(user);
+            return RedirectToAction("Index", "Product");
+        }
+        catch (Exception ex)
+        {
+            ViewBag.ErrorMessage = $"Ошибка при регистрации: {ex.Message}";
+            return View(user);
+        }
     }
 }

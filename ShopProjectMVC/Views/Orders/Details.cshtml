@@ -1,0 +1,37 @@
+﻿@model ShopProjectMVC.Core.Models.Order
+
+@{
+    ViewData["Title"] = "Details";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+<h1>Order Details</h1>
+
+<div>
+    <h4>Order</h4>
+    <hr />
+    <dl class="row">
+        <dt class="col-sm-2">
+            UserName
+        </dt>
+        <dd class="col-sm-10">
+            @Model.User.Name
+        </dd>
+        <dt class="col-sm-2">
+            Product Name
+        </dt>
+        <dd class="col-sm-10">
+            @Model.Product.Name
+        </dd>
+        <dt class="col-sm-2">
+            CreatedAt
+        </dt>
+        <dd class="col-sm-10">
+            @Model.CreatedAt
+        </dd>
+        <dd class="col-sm-10">
+            <img src="~/pictures/@Model.Product.Image" alt="Picture of @Model.Product.Name" class="product-img"/>
+        </dd>
+    </dl>
+    <a asp-action="Index">Back to List</a>
+</div>

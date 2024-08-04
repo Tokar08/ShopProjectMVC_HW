@@ -1,5 +1,6 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using ShopProjectMVC.Core.Access;
+using ShopProjectMVC.Core.Exceptions;
 using ShopProjectMVC.Core.Interfaces;
 using ShopProjectMVC.Core.Models;
 
@@ -7,8 +8,8 @@ namespace ShopProjectMVC.Controllers;
 
 public class ProductController : Controller
 {
-    private readonly IProductService _productService;
     private readonly IWebHostEnvironment _env;
+    private readonly IProductService _productService;
 
     public ProductController(IProductService productService, IWebHostEnvironment env)
     {
@@ -16,16 +17,20 @@ public class ProductController : Controller
         _env = env;
     }
 
-    public async Task<IActionResult> Index()
+    public IActionResult Index()
     {
-        //HttpContext.Session.SetString("user", "Name");
-        //HttpContext.Session.SetInt32("role", (int)Role.Admin);
-        //HttpContext.Session.SetInt32("id", 1);
-
-        var products = await Task.Run(() => _productService.GetAll());
-        return View(products);
+        try
+        {
+            var products = _productService.GetAll();
+            return View(products);
+        }
+        catch (Exception ex)
+        {
+            ViewBag.ErrorMessage = "Ошибка при получении продуктов: " + ex.Message;
+            return View("Error");
+        }
     }
-    
+
     [RequireLogin]
     public IActionResult Create()
     {
@@ -37,26 +42,43 @@ public class ProductController : Controller
     [RequireLogin]
     public async Task<IActionResult> Create(Product product, int category, IFormFile file)
     {
-        string hash = Guid.NewGuid().ToString();
-        string name = Path.GetFileNameWithoutExtension(file.FileName) + hash + Path.GetExtension(file.FileName);
-        string path = Path.Combine(_env.WebRootPath, "pictures", name);
-        using (var fileStream = new MemoryStream())
+        try
         {
-            file.CopyTo(fileStream);
+            var hash = Guid.NewGuid().ToString();
+            var name = Path.GetFileNameWithoutExtension(file.FileName) + hash + Path.GetExtension(file.FileName);
+            var path = Path.Combine(_env.WebRootPath, "pictures", name);
+            using var fileStream = new MemoryStream();
+            await file.CopyToAsync(fileStream);
             await System.IO.File.WriteAllBytesAsync(path, fileStream.ToArray());
+            
+            product.Image = name;
+            product.Category = _productService.GetAllCategories().First(x => x.Id == category);
+            await _productService.AddProduct(product);
+            return RedirectToAction("Index");
         }
-
-        product.Image = name;
-        product.Category = _productService.GetAllCategories().First(x => x.Id == category);
-        await _productService.AddProduct(product);
-        return RedirectToAction("Index");
+        catch (Exception ex)
+        {
+            ViewBag.ErrorMessage = "Ошибка при добавлении продукта: " + ex.Message;
+            return View("Error");
+        }
     }
-    
+
+
     [RequireLogin]
     public async Task<IActionResult> Delete(int id)
     {
-        var product = await _productService.GetProductById(id);
-        return View(product);
+        try
+        {
+            var product = await _productService.GetProductById(id)
+                          ?? throw new EntityNotFoundException(typeof(Product), id);
+
+            return View(product);
+        }
+        catch (Exception ex)
+        {
+            ViewBag.ErrorMessage = "Ошибка при получении продукта для удаления: " + ex.Message;
+            return View("Error");
+        }
     }
 
     [HttpPost]
@@ -65,27 +87,58 @@ public class ProductController : Controller
     [ValidateAntiForgeryToken]
     public async Task<IActionResult> DeleteProduct(int id)
     {
-        var product = await _productService.GetProductById(id);
-        string path = Path.Combine(_env.WebRootPath, "pictures", product.Image);
-        await _productService.DeleteProduct(id);
-        System.IO.File.Delete(path);
-        return RedirectToAction("Index");
+        try
+        {
+            var product = await _productService.GetProductById(id)
+                          ?? throw new EntityNotFoundException(typeof(Product), id);
+
+            var path = Path.Combine(_env.WebRootPath, "pictures", product.Image);
+            await _productService.DeleteProduct(id);
+            System.IO.File.Delete(path);
+
+            return RedirectToAction("Index");
+        }
+        catch (Exception ex)
+        {
+            ViewBag.ErrorMessage = "Ошибка при удалении продукта: " + ex.Message;
+            return View("Error");
+        }
     }
 
     [HttpPost]
     [RequireLogin]
     public async Task<IActionResult> Buy(int id)
     {
-        int userId = HttpContext.Session.GetInt32("id").Value;
-        await _productService.BuyProduct(userId, id);
-        return RedirectToAction("Index");
+        try
+        {
+            var userId = HttpContext.Session.GetInt32("id")
+                         ?? throw new InvalidOperationException("В сессии такой Id не найден");
+
+            await _productService.BuyProduct(userId, id);
+            return RedirectToAction("Index");
+        }
+        catch (Exception ex)
+        {
+            ViewBag.ErrorMessage = "Ошибка при покупке продукта: " + ex.Message;
+            return View("Error");
+        }
     }
-    
+
     [RequireLogin]
     public async Task<IActionResult> Edit(int id)
     {
-        var product = await _productService.GetProductById(id);
-        return View(product);
+        try
+        {
+            var product = await _productService.GetProductById(id)
+                          ?? throw new EntityNotFoundException(typeof(Product), id);
+
+            return View(product);
+        }
+        catch (Exception ex)
+        {
+            ViewBag.ErrorMessage = "Ошибка при получении продукта для редактирования: " + ex.Message;
+            return View("Error");
+        }
     }
 
     [HttpPost]
@@ -94,12 +147,23 @@ public class ProductController : Controller
     [ValidateAntiForgeryToken]
     public async Task<IActionResult> EditProduct(Product product, int id)
     {
-        var productFromDb = await _productService.GetProductById(id);
-        productFromDb.Name = product.Name;
-        productFromDb.Description = product.Description;
-        productFromDb.Price = product.Price;
-        productFromDb.Count = product.Count;
-        await _productService.UpdateProduct(productFromDb);
-        return RedirectToAction("Index");
+        try
+        {
+            var productFromDb = await _productService.GetProductById(id)
+                                ?? throw new EntityNotFoundException(typeof(Product), id);
+
+            productFromDb.Name = product.Name;
+            productFromDb.Description = product.Description;
+            productFromDb.Price = product.Price;
+            productFromDb.Count = product.Count;
+
+            await _productService.UpdateProduct(productFromDb);
+            return RedirectToAction("Index");
+        }
+        catch (Exception ex)
+        {
+            ViewBag.ErrorMessage = "Ошибка при обновлении продукта: " + ex.Message;
+            return View("Error");
+        }
     }
 }

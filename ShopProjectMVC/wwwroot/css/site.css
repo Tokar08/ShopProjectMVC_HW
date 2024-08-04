@@ -22,31 +22,30 @@ body {
 }
 
 .card {
-  width: 190px;
-  height: 254px;
+  width: 100%;
   padding: .8em;
   background: #f5f5f5;
   position: relative;
-  overflow: visible;
-  margin: 5px;
+  overflow: hidden;
+  margin: 20px;
   box-shadow: 0 1px 3px rgba(0,0,0,0.12), 0 1px 2px rgba(0,0,0,0.24);
+  display: flex;
+  flex-direction: column;
 }
 
 .card-img {
   background-color: #ffcaa6;
-  height: 60%;
   width: 100%;
+  height: 150px;
   border-radius: .5rem;
   transition: .3s ease;
+  object-fit: cover;
+  object-position: center;
 }
 
 .card-info {
-  padding-top: 10%;
-}
-
-svg {
-  width: 20px;
-  height: 20px;
+  padding-top: 10px;
+  color: #000;
 }
 
 .card-footer {
@@ -58,19 +57,19 @@ svg {
   border-top: 1px solid #ddd;
 }
 
-/*Text*/
 .text-title {
   font-weight: 900;
   font-size: 1.2em;
   line-height: 1.5;
+  color: #000;
 }
 
 .text-body {
   font-size: .9em;
   padding-bottom: 10px;
+  color: #000;
 }
 
-/*Button*/
 .card-button {
   border: 1px solid #252525;
   display: flex;
@@ -80,9 +79,8 @@ svg {
   transition: .3s ease-in-out;
 }
 
-/*Hover*/
 .card-img:hover {
-  transform: translateY(-25%);
+  transform: translateY(-7%);
   box-shadow: rgba(226, 196, 63, 0.25) 0px 13px 47px -5px, rgba(180, 71, 71, 0.3) 0px 8px 16px -8px;
 }
 
@@ -91,25 +89,31 @@ svg {
   background-color: #ffcaa6;
 }
 
-
 .container {
   margin-bottom: 40px;
 }
 
-/* Grid Container */
 .grid-container {
   display: grid;
-  grid-template-columns: repeat(4, 1fr);
-  gap: 10px;
+  grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+  gap: 20px;
 }
 
-/* Flexbox Container */
 .flex-container {
   display: flex;
   flex-wrap: wrap;
-  gap: 10px;
+  gap: 20px;
 }
 
 .flex-container .product {
-  flex: 1 1 calc(25% - 10px);
+  flex: 1 1 calc(25% - 20px);
 }
+
+.product-img {
+  width: 400px;
+  height: auto; 
+  object-fit: cover; 
+  border-radius: .5rem; 
+}
+
+

@@ -1,45 +1,33 @@
 ﻿@model IEnumerable<ShopProjectMVC.Core.Models.Order>
 
 @{
-    ViewData["Title"] = "Index";
-    Layout = "~/Views/Shared/_Layout.cshtml";
+ViewData["Title"] = "Index";
+Layout = "~/Views/Shared/_Layout.cshtml";
 }
 
 <h1>Orders</h1>
 
 <table class="table">
     <thead>
-        <tr>
-            <th>
-                UserName
-            </th>
-            <th>
-                Product Name
-            </th>
-            <th>
-                CreatedAt
-            </th>
-            <th></th>
-        </tr>
+    <tr>
+        <th>UserName</th>
+        <th>Product Name</th>
+        <th>CreatedAt</th>
+        <th></th>
+    </tr>
     </thead>
     <tbody>
-@foreach (var item in Model) {
-        <tr>
-            <td>
-                @item.User.Name
-            </td>
-                <td>
-                    @item.Product.Name
-                </td>
-                <td>
-                    @item.CreatedAt
-                </td>
-            <td>
-                <a asp-action="Edit" asp-route-id="@item.Id">Edit</a> |
-                <a asp-action="Details" asp-route-id="@item.Id">Details</a> |
-                <a asp-action="Delete" asp-route-id="@item.Id">Delete</a>
-            </td>
-        </tr>
-}
+    @foreach (var item in Model)
+    {
+    <tr>
+        <td>@item.User.Name</td>
+        <td>@item.Product.Name</td>
+        <td>@item.CreatedAt</td>
+        <td>
+            <a asp-action="Details" asp-route-id="@item.Id">Details</a> |
+            <a asp-action="Delete" asp-route-id="@item.Id">Delete</a>
+        </td>
+    </tr>
+    }
     </tbody>
 </table>
